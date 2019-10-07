@@ -1,4 +1,4 @@
-# ImageParser.csproj
+# ImageParser
 Получение информации о изображении в JSON формате
 
 Текст задачи:
