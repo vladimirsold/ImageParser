@@ -12,6 +12,20 @@ namespace ImageParser
         long Size { get; }
     }
 
+    public static class ArrayExtension
+    {
+        public static int GetInt32MSB(this byte[] data, int position)
+        {
+            var number = new byte[4];
+            Array.Copy(data, position, number, 0, 4);
+            if(BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(number);
+            }
+            return BitConverter.ToInt32(number, 0);
+        }
+    }
+
     public class ImageParser : IImageParser
     {
 
@@ -53,17 +67,6 @@ namespace ImageParser
         {
             Size = stream.Length;
         }
-
-        protected int ToInt32FromByteArrayMSB(byte[] data, int position)
-        {
-            var number = new byte[4];
-            Array.Copy(data, position, number, 0, 4);
-            if(BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(number);
-            }
-            return BitConverter.ToInt32(number, 0);
-        }
     }
 
     class PngFileInfo : ImageFileInfo
@@ -79,8 +82,8 @@ namespace ImageParser
             IHDRChunk = new byte[sizeIHDRChunk];
             stream.Seek(positionIHDRChunk, SeekOrigin.Begin);
             stream.Read(IHDRChunk, 0, sizeIHDRChunk);
-            Height = ToInt32FromByteArrayMSB(IHDRChunk, positionHeightInIHDR);
-            Width = ToInt32FromByteArrayMSB(IHDRChunk, positionWidthInIHDR);
+            Height = IHDRChunk.GetInt32MSB(positionHeightInIHDR);
+            Width = IHDRChunk.GetInt32MSB(positionWidthInIHDR);
         }
     }
 
